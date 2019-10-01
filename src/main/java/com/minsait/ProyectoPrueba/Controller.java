@@ -16,70 +16,90 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 //Un comentario cualquiera 
 
+import com.minsait.demo.modelo.Empleado;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("${ms.api.version}/")
+@Api(value = "/${ms.api.version}", description  = "Controlador de gestion de empleados de arquitectura")
 public class Controller {
-	public List<Empleado> listaEmpleados = new ArrayList<Empleado>();
-	
+
+	List<Empleado> listaEmpleados = new ArrayList<Empleado>();
+
+	@ApiOperation(httpMethod = "GET", value = "Mostrar la lista de empleados", notes = "añadir comentarios")
+	@ApiResponses(value = {
+			@ApiResponse(code = 202, message = "La lista de usuarios se ha devuelto correctamente"),
+			@ApiResponse(code = 404, message = "No se encuentran datos de la lista"),
+			@ApiResponse(code = 500, message = "Unexpected exception (Internal Server Error)") })
 	@GetMapping("/empleados")
 	public ResponseEntity<Object> showEmpleados() {
-		
+
 		HashMap<String, Object> content = new HashMap<>();
-		content.put("Usuarios registrados: ",listaEmpleados);
-		
+		content.put("Usuarios registrados: ", listaEmpleados);
+
 		return new ResponseEntity<>(content, HttpStatus.ACCEPTED);
 	}
-	
-	// Esta función añade empleados a través de URL
+
 	@PostMapping("/empleados")
-	public ResponseEntity<Object> insertEmpleados(@RequestBody Empleado e) {
-		// Con esto hemos especificado simplemente el formato
-		
-		// Aquí estamos creando al empleado
-		listaEmpleados.add(new Empleado(e.getId(), e.getName(), e.getPuesto(), e.getSueldo())); 
+	public ResponseEntity<Object> addEmpleados(@RequestBody Empleado e) {
 
-		return new ResponseEntity<>("empleado añadido", HttpStatus.ACCEPTED);
+		listaEmpleados.add(new Empleado(e.getId(), e.getName(), e.getPuesto(), e.getSueldo()));
+
+		return new ResponseEntity<>("se ha añadido", HttpStatus.ACCEPTED);
+
 	}
-	
-	// Eliminar empleados 
-	// --> Mapear: hacer el "http"
+
 	@DeleteMapping("/empleados/{id}")
-	public ResponseEntity<Object> deleteEmpleados(@PathVariable(value="id") int id) {
-		
+	public ResponseEntity<Object> deleteEmpleados(@PathVariable(value = "id") int id) {
+
 		for (Empleado e : listaEmpleados) {
-			
-			if (e.getId() == id) {
+
+			if (e.getId().equals(id)) {
 				listaEmpleados.remove(e);
-				return new ResponseEntity<>("Empleado eliminado correctamente", HttpStatus.ACCEPTED);
 			}
 		}
 
-		return new ResponseEntity<>("No encontrado", HttpStatus.NOT_FOUND);
-	}
-	@DeleteMapping("/empleados_delete_por_body")
-	public ResponseEntity<Object> deleteEmpleadosBody(@RequestBody String name)  {
-		
-		for (Empleado e : listaEmpleados) {
-			
-			if (e.getName().equals(name)) {
-				listaEmpleados.remove(e);
-				return new ResponseEntity<>("Empleado eliminado correctamente", HttpStatus.ACCEPTED);
-			}
-		}
-
-		return new ResponseEntity<>("No encontrado", HttpStatus.NOT_FOUND);
-	}
-	@PutMapping("/empleado/{id}/{subida}")
-	public ResponseEntity<Object> aumentarSueldo(@PathVariable(value="id") Long id, @PathVariable(value="subida") int subida) {
-		for (Empleado e : listaEmpleados) {
-			
-			if (e.getId() == id) {
-				Long nuevoSueldo = e.getSueldo()*subida;
-				e.setSueldo(nuevoSueldo);
-				return new ResponseEntity<>("Sueldo subido correctamente a "+ e.getName() +".", HttpStatus.ACCEPTED);
-			}
-		}
-		
 		return new ResponseEntity<>("Empleado eliminado correctamente", HttpStatus.ACCEPTED);
 	}
+
+	@PutMapping("/empleados/{puesto}")
+	public ResponseEntity<Object> modificarEmpleados(@RequestBody Long multiplicadorSueldo,
+			@PathVariable String puesto) {
+		boolean encontrado = false;
+
+		for (Empleado e : listaEmpleados) {
+
+			if (e.getPuesto().equals(puesto)) {
+				encontrado = true;
+				e.setSueldo(multiplicadorSueldo * e.getSueldo());
+
+			}
+
+		}
+		if (encontrado == true) {
+
+			return new ResponseEntity<>("se ha modificado personal con el puesto " + puesto, HttpStatus.ACCEPTED);
+		} else {
+			return new ResponseEntity<>("no existe personal con ese puesto", HttpStatus.ACCEPTED);
+		}
+	}
+
+	@DeleteMapping("/empleados")
+	public ResponseEntity<Object> deleteEmpleados(@RequestBody String name) {
+
+		for (Empleado e : listaEmpleados) {
+
+			if (e.getName().equals(name)) {
+				listaEmpleados.remove(e);
+			}
+		}
+
+		return new ResponseEntity<>("se ha eliminado", HttpStatus.ACCEPTED);
+
+	}
+
 }
