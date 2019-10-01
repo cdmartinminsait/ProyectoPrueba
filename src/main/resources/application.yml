@@ -1,5 +1,5 @@
 ms:
-  api:
-    version: arquitectura
-    title: templates Microservice API
-    description: Microservice which expose templates Data.
+   api:
+      version: arquitectura
+      title: templates Microservice API
+      description: Microservice which expose templates Data. 
