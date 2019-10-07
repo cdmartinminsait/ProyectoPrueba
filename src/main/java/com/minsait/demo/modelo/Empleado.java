@@ -2,24 +2,50 @@ package com.minsait.demo.modelo;
 
 
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 @ApiModel(value="Empleado", description="Se suministran los datos del usuario bla bla bla") 
 @Data
 @NoArgsConstructor
-public class Empleado {
+@Entity
+@Table(name = "postgres")
+public class Empleado implements Serializable{
 	
+	private static final long serialVersionUID = -2343243243242432341L; 
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@Column(name = "name") 
 	private String name;
+	@Column(name = "puesto") 
 	private String puesto;
+	@Column(name = "sueldo") 
 	private Long sueldo;
-	
-	
 	public Empleado(Long id, String name, String puesto, Long sueldo) {
-		super();
+
 		this.id = id;
+		this.name = name;
+		this.puesto = puesto;
+		this.sueldo = sueldo;
+	}
+	public Empleado() {
+
+	}
+	
+	public Empleado( String name, String puesto, Long sueldo) {
+
+
 		this.name = name;
 		this.puesto = puesto;
 		this.sueldo = sueldo;

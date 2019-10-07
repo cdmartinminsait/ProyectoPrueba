@@ -13,10 +13,12 @@ public class Security extends WebSecurityConfigurerAdapter{
 	public void configure(HttpSecurity http) throws Exception {
 	
 		http.authorizeRequests()
-        .antMatchers("/arquitectura/empleados").permitAll()
+        .antMatchers("/**").permitAll()
         .anyRequest().authenticated()
         .and()
-        .httpBasic();
+        .httpBasic()
+        .and()
+        .csrf().disable();
 	}
 
 }
